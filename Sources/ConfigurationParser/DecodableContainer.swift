@@ -8,8 +8,8 @@ struct DecodableContainer: Decodable {
         self._container = try decoder.container(keyedBy: StringCodingKey.self)
     }
 
-    var allKeys: [String] {
-        _container.allKeys.map(\.stringValue)
+    var allKeys: Set<OptionName> {
+        Set(_container.allKeys.map(OptionName.init(_:)))
     }
 
     func decode<T: Decodable>(_ type: T.Type, forKey key: StringCodingKey) throws -> T {

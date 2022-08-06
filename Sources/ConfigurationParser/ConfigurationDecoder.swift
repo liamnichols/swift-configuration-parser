@@ -3,23 +3,25 @@ import Foundation
 struct ConfigurationDecoder {
     let definitions: [OptionName: OptionDefinition]
     let dataContainer: DecodableContainer?
+    let overridesContainer: OverrideContainer?
     let codingPath: [CodingKey]
     let issueHandler: IssueHandler
     let userInfo: [CodingUserInfoKey: Any]
-
-    let allKeys: Set<String>
+    let allKeys: Set<OptionName>
 
     init(
         definitions: [OptionDefinition],
         dataContainer: DecodableContainer?,
+        overridesContainer: OverrideContainer?,
         codingPath: [CodingKey],
         issueHandler: @escaping IssueHandler
     ) {
         let definitions = Dictionary(uniqueKeysWithValues: definitions.map({ ($0.name, $0) }))
-        let allKeys = Set(dataContainer?.allKeys ?? []) // + overrides.keys(in: codingPath)
+        let allKeys = (dataContainer?.allKeys ?? []).union((overridesContainer?.allKeys(in: codingPath) ?? []))
 
         self.definitions = definitions
         self.dataContainer = dataContainer
+        self.overridesContainer = overridesContainer
         self.codingPath = codingPath
         self.issueHandler = issueHandler
         self.userInfo = [:]
@@ -27,16 +29,14 @@ struct ConfigurationDecoder {
 
         lazy var codingPath: [OptionName] = codingPath.map(OptionName.init(_:))
         for key in allKeys {
-            let name = OptionName(rawValue: key)
-
-            if let definition = definitions[name], case .deprecated(let message) = definition.availability {
+            if let definition = definitions[key], case .deprecated(let message) = definition.availability {
                 let context = Issue.Context(codingPath: codingPath, description: message)
-                issueHandler(.deprecatedOption(name, context))
+                issueHandler(.deprecatedOption(key, context))
             }
 
-            if definitions[name] == nil {
+            if definitions[key] == nil {
                 let context = Issue.Context(codingPath: codingPath, description: "")
-                issueHandler(.unexpectedOption(name, context))
+                issueHandler(.unexpectedOption(key, context))
             }
         }
     }
@@ -74,11 +74,11 @@ final class ConfigurationDecodingContainer<K: CodingKey>: KeyedDecodingContainer
     }
 
     var allKeys: [K] {
-        decoder.allKeys.compactMap(K.init(stringValue:))
+        decoder.allKeys.compactMap { K(stringValue: $0.rawValue) }
     }
 
     func contains(_ key: K) -> Bool {
-        decoder.allKeys.contains(key.stringValue)
+        decoder.allKeys.contains(OptionName(key))
     }
 
     func decodeNil(forKey key: K) throws -> Bool {
@@ -144,8 +144,12 @@ struct OptionDecoder: Decoder {
 
     func decodeIfPresent<T: Decodable>(_ type: T.Type) throws -> T? {
         let key = StringCodingKey(codingPath.last!)
-        let value = try underlying.dataContainer?.decodeIfPresent(type, forKey: key)
-        return value
+
+        if let value = try underlying.overridesContainer?.decodeIfPresent(type, forKey: key, in: codingPath.dropLast()) {
+            return value
+        }
+
+        return  try underlying.dataContainer?.decodeIfPresent(type, forKey: key)
     }
 }
 
@@ -182,6 +186,7 @@ struct OptionContainer: SingleValueDecodingContainer {
         return try T(from: ConfigurationDecoder(
             definitions: definitions,
             dataContainer: nestedContainer,
+            overridesContainer: decoder.underlying.overridesContainer,
             codingPath: codingPath,
             issueHandler: decoder.underlying.issueHandler
         ))

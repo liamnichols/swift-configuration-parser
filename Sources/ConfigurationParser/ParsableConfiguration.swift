@@ -9,6 +9,7 @@ public extension ParsableConfiguration {
         try! Self(from: ConfigurationDecoder(
             definitions: options,
             dataContainer: nil,
+            overridesContainer: nil,
             codingPath: [],
             issueHandler: { _ in }
         ))
@@ -16,12 +17,14 @@ public extension ParsableConfiguration {
 
     static func parse(
         using data: Data,
+        overrides: [OptionOverride] = [],
         decoder: DecoderProtocol = JSONDecoder(),
         issueHandler: @escaping IssueHandler = Issue.log(_:)
     ) throws -> Self {
         try Self(from: ConfigurationDecoder(
             definitions: options,
             dataContainer: try decoder.decode(DecodableContainer.self, from: data),
+            overridesContainer: OverrideContainer(overrides: overrides, decoder: decoder),
             codingPath: [],
             issueHandler: issueHandler
         ))

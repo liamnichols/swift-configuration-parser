@@ -88,10 +88,41 @@ final class ConfigurationParserTests: XCTestCase {
             recordedIssues.append(issue)
         }
 
-        XCTAssertEqual(recordedIssues.map(\.description), [
+        XCTAssertEqual(Set(recordedIssues.map(\.description)), [
             "Found unexpected property ‘defaultPowerlevel‘ while decoding.",
             "Property ‘preferredLanguage‘ is deprecated. Replaced by ‘preferredLanguages‘",
             "Found unexpected property ‘isActive‘ (in ‘author‘) while decoding."
+        ])
+    }
+
+    func testOverride() throws {
+        let data = Data("""
+        {
+          "defaultPowerLevel": 0,
+          "author": {
+            "name": "In the file"
+          }
+        }
+        """.utf8)
+
+        let overrides: [OptionOverride] = [
+            #"defaultPowerLevel: 2          "#,
+            #"author.name: "Foo"            "#,
+            #"preferredLanguages: ["en"]    "#,
+            #"unknownProperty: false        "#
+        ]
+
+        var recordedIssues: [Issue] = []
+        let configuration = try Configuration.parse(using: data, overrides: overrides) { issue in
+            recordedIssues.append(issue)
+        }
+
+        XCTAssertEqual(configuration.defaultPowerLevel, .high)
+        XCTAssertEqual(configuration.author.name, "Foo")
+        XCTAssertEqual(configuration.preferredLanguages, ["en"])
+
+        XCTAssertEqual(Set(recordedIssues.map(\.description)), [
+            "Found unexpected property ‘unknownProperty‘ while decoding."
         ])
     }
 }
