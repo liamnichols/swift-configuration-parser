@@ -32,8 +32,6 @@ struct Configuration: ParsableConfiguration {
     @Option(.deprecated("Replaced by ‘preferredLanguages‘"), hidden: true)
     var preferredLanguage: String? = nil
 
-    var showInternalMenu: Bool = false
-
     @Option(summary: "Details of the author used when creating commits")
     var author: Author
 
@@ -72,6 +70,8 @@ let configuration = try Configuration.parse(data)
 - Detect unexpected properties (typos/misconfiguration) while loading
 - Flexible overrides
 - Customizable decoding - Uses `JSONDecoder` by default but you can plug in anything
+
+For an example, see [Example](./Example/).
 
 ---
 
