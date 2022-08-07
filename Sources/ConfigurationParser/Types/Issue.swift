@@ -15,24 +15,13 @@ public enum Issue: Equatable {
     case deprecatedOption(Name, Context)
 }
 
-extension Name {
-    func format(in path: [Name]) -> String {
-        if path.isEmpty {
-            return "‘\(rawValue)‘"
-        } else {
-            let path = path.map(\.rawValue).joined(separator: ".")
-            return "‘\(rawValue)‘ (in ‘\(path)‘)"
-        }
-    }
-}
-
 extension Issue: CustomStringConvertible {
     public var description: String {
         switch self {
         case .unexpectedOption(let name, let context):
-            return "Found unexpected property \(name.format(in: context.codingPath)) while decoding."
+            return "Found unexpected property \(name.formattedAsQuote(in: context.codingPath)) while decoding."
         case .deprecatedOption(let name, let context):
-            return "Property \(name.format(in: context.codingPath)) is deprecated. \(context.description)"
+            return "Property \(name.formattedAsQuote(in: context.codingPath)) is deprecated. \(context.description)"
         }
     }
 }
