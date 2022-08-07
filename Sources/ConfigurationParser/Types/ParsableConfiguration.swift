@@ -16,7 +16,7 @@ public extension ParsableConfiguration {
     }
 
     static func parse(
-        using data: Data,
+        _ data: Data,
         overrides: [OptionOverride] = [],
         decoder: DecoderProtocol = JSONDecoder(),
         issueHandler: @escaping IssueHandler = Issue.log(_:)
@@ -28,6 +28,16 @@ public extension ParsableConfiguration {
             codingPath: [],
             issueHandler: issueHandler
         ))
+    }
+
+    static func parse(
+        contentsOf fileURL: URL,
+        overrides: [OptionOverride] = [],
+        decoder: DecoderProtocol = JSONDecoder(),
+        issueHandler: @escaping IssueHandler = Issue.log(_:)
+    ) throws -> Self {
+        let data = try Data(contentsOf: fileURL)
+        return try parse(data, overrides: overrides, decoder: decoder, issueHandler: issueHandler)
     }
 }
 

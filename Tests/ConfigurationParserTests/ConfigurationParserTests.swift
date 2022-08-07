@@ -71,7 +71,7 @@ final class ConfigurationParserTests: XCTestCase {
         }
         """.utf8)
 
-        let configuration = try Configuration.parse(using: data)
+        let configuration = try Configuration.parse(data)
 
         XCTAssertEqual(configuration.defaultPowerLevel, .high)
         XCTAssertEqual(configuration.preferredLanguages, ["es", "fr"])
@@ -93,7 +93,7 @@ final class ConfigurationParserTests: XCTestCase {
         """.utf8)
 
         var recordedIssues: [Issue] = []
-        _ = try Configuration.parse(using: data) { issue in
+        _ = try Configuration.parse(data) { issue in
             recordedIssues.append(issue)
         }
 
@@ -122,7 +122,7 @@ final class ConfigurationParserTests: XCTestCase {
         ]
 
         var recordedIssues: [Issue] = []
-        let configuration = try Configuration.parse(using: data, overrides: overrides) { issue in
+        let configuration = try Configuration.parse(data, overrides: overrides) { issue in
             recordedIssues.append(issue)
         }
 
