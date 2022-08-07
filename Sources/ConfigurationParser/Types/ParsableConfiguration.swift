@@ -42,13 +42,7 @@ public extension ParsableConfiguration {
         decoder: T,
         issueHandler: @escaping IssueHandler = Issue.log(_:)
     ) throws -> Self where T.Input == Data {
-        try Self(from: ConfigurationDecoder(
-            definitions: options,
-            dataContainer: try decoder.decode(DecodableContainer.self, from: data),
-            overridesContainer: OverrideContainer(overrides: overrides, decoder: TopLevelDataDecoder(decoder)),
-            codingPath: [],
-            issueHandler: issueHandler
-        ))
+        try parse(data: data, overrides: overrides, decoder: decoder, issueHandler: issueHandler)
     }
 
     /// Parses the configuration using the provided data with the given overrides as JSON.
@@ -72,7 +66,7 @@ public extension ParsableConfiguration {
         overrides: [OptionOverride] = [],
         issueHandler: @escaping IssueHandler = Issue.log(_:)
     ) throws -> Self {
-        try self.parse(data, overrides: overrides, decoder: JSONDecoder(), issueHandler: issueHandler)
+        try parse(data, overrides: overrides, decoder: JSONDecoder(), issueHandler: issueHandler)
     }
 
     /// Parses the configuration from the given file with the given overrides.
@@ -123,6 +117,58 @@ public extension ParsableConfiguration {
         issueHandler: @escaping IssueHandler = Issue.log(_:)
     ) throws -> Self {
         try parse(contentsOf: fileURL, overrides: overrides, decoder: JSONDecoder(), issueHandler: issueHandler)
+    }
+
+    /// Parses the configuration using the provided overrides.
+    ///
+    /// If an override was not specified for a value, it's default will be used instead.
+    /// When processing values from `overrides`, they are decoded using the given `decoder`.
+    ///
+    /// - Parameters:
+    ///   - overrides: An array of individual overrides that take priority over the values defined in the configuration.
+    ///   - decoder: A type used to decode the `data` or the `valueString`'s provided in the `overrides`.
+    ///   - issueHandler: A closure invoked whenever an issue is detected. By default a message will be printed to the console.
+    /// - Returns: The configuration will all options successfully resolved to a value.
+    static func parse<T: TopLevelDecoder>(
+        overrides: [OptionOverride] = [],
+        decoder: T,
+        issueHandler: @escaping IssueHandler = Issue.log(_:)
+    ) throws -> Self where T.Input == Data {
+        try parse(data: nil, overrides: overrides, decoder: decoder, issueHandler: issueHandler)
+    }
+
+    /// Parses the configuration using the provided overrides as JSON.
+    ///
+    /// If an override was not specified for a value, it's default will be used instead.
+    /// When processing values from `overrides`, they are decoded using `JSONDecoder` with a default configuration.
+    /// To customise this behaviour, or use a different file format instead, pass a custom decoder using ``parse(overrides:decoder:issueHandler:)``.
+    ///
+    /// - Parameters:
+    ///   - overrides: An array of individual overrides that take priority over the values defined in the configuration.
+    ///   - decoder: A type used to decode the `data` or the `valueString`'s provided in the `overrides`.
+    ///   - issueHandler: A closure invoked whenever an issue is detected. By default a message will be printed to the console.
+    /// - Returns: The configuration will all options successfully resolved to a value.
+    static func parse(
+        overrides: [OptionOverride] = [],
+        issueHandler: @escaping IssueHandler = Issue.log(_:)
+    ) throws -> Self {
+        try parse(data: nil, overrides: overrides, decoder: JSONDecoder(), issueHandler: issueHandler)
+    }
+
+    /// Internal implementation
+    private static func parse<T: TopLevelDecoder>(
+        data: Data?,
+        overrides: [OptionOverride],
+        decoder: T,
+        issueHandler: @escaping IssueHandler
+    ) throws -> Self where T.Input == Data {
+        try Self(from: ConfigurationDecoder(
+            definitions: options,
+            dataContainer: data.flatMap { try decoder.decode(DecodableContainer.self, from: $0) },
+            overridesContainer: OverrideContainer(overrides: overrides, decoder: TopLevelDataDecoder(decoder)),
+            codingPath: [],
+            issueHandler: issueHandler
+        ))
     }
 }
 
