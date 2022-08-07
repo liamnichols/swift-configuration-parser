@@ -2,7 +2,7 @@ import Foundation
 
 struct OverrideContainer {
     let overrides: [OptionOverride]
-    let decoder: DecoderProtocol
+    let decoder: DataDecoder
 
     func decodeIfPresent<T: Decodable>(_ type: T.Type, forKey key: CodingKey, in codingPath: [CodingKey]) throws -> T? {
         let name = Name(key)
