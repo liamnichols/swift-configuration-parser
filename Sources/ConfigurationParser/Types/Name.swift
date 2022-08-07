@@ -1,6 +1,6 @@
 import Foundation
 
-public struct OptionName: RawRepresentable, Hashable {
+public struct Name: RawRepresentable, Hashable {
     public let rawValue: String
 
     public init(rawValue: String) {

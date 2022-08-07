@@ -31,22 +31,22 @@ public extension ParsableConfiguration {
     }
 }
 
-extension ParsableConfiguration {
+public extension ParsableConfiguration {
     static var options: [OptionDefinition] {
         Mirror(reflecting: Self())
             .children
             .compactMap(definition(from:))
     }
 
-    static func definition(from child: Mirror.Child) -> OptionDefinition? {
+    private static func definition(from child: Mirror.Child) -> OptionDefinition? {
         guard let codingKey = child.label else { return nil }
 
         // Property wrappers have underscore-prefixed names, be sure to strip
-        let name: OptionName
+        let name: Name
         if codingKey.hasPrefix("_") {
-            name = OptionName(rawValue: String(codingKey.dropFirst()))
+            name = Name(rawValue: String(codingKey.dropFirst()))
         } else {
-            name = OptionName(rawValue: codingKey)
+            name = Name(rawValue: codingKey)
         }
 
         // If the property was a property wrapper, return it's definition
@@ -59,7 +59,7 @@ extension ParsableConfiguration {
             name: name,
             content: .defaultValue(child.value),
             availability: .available,
-            documentation: Documentation(hidden: true)
+            documentation: Documentation()
         )
     }
 }

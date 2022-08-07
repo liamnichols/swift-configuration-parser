@@ -1,13 +1,13 @@
 import Foundation
 
 struct ConfigurationDecoder {
-    let definitions: [OptionName: OptionDefinition]
+    let definitions: [Name: OptionDefinition]
     let dataContainer: DecodableContainer?
     let overridesContainer: OverrideContainer?
     let codingPath: [CodingKey]
     let issueHandler: IssueHandler
     let userInfo: [CodingUserInfoKey: Any]
-    let allKeys: Set<OptionName>
+    let allKeys: Set<Name>
 
     init(
         definitions: [OptionDefinition],
@@ -27,7 +27,7 @@ struct ConfigurationDecoder {
         self.userInfo = [:]
         self.allKeys = allKeys
 
-        lazy var codingPath: [OptionName] = codingPath.map(OptionName.init(_:))
+        lazy var codingPath: [Name] = codingPath.map(Name.init(_:))
         for key in allKeys {
             if let definition = definitions[key], case .deprecated(let message) = definition.availability {
                 let context = Issue.Context(codingPath: codingPath, description: message)
@@ -78,7 +78,7 @@ final class ConfigurationDecodingContainer<K: CodingKey>: KeyedDecodingContainer
     }
 
     func contains(_ key: K) -> Bool {
-        decoder.allKeys.contains(OptionName(key))
+        decoder.allKeys.contains(Name(key))
     }
 
     func decodeNil(forKey key: K) throws -> Bool {
@@ -86,7 +86,7 @@ final class ConfigurationDecodingContainer<K: CodingKey>: KeyedDecodingContainer
     }
 
     func decode<T: Decodable>(_ type: T.Type, forKey key: K) throws -> T {
-        guard let definition = decoder.definitions[OptionName(key)] else {
+        guard let definition = decoder.definitions[Name(key)] else {
             throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: """
                 Trying to decode a key that is not known. Did you annotate it with @Option?
                 """))

@@ -4,19 +4,19 @@ public typealias IssueHandler = (Issue) -> Void
 
 public enum Issue: Equatable {
     public struct Context: Equatable {
-        public let codingPath: [OptionName]
+        public let codingPath: [Name]
         public let description: String
     }
 
     /// A property that was not defined as part of the configuration options was seen during decoding.
-    case unexpectedOption(OptionName, Context)
+    case unexpectedOption(Name, Context)
 
     /// A property that is marked as deprecated has been decoded.
-    case deprecatedOption(OptionName, Context)
+    case deprecatedOption(Name, Context)
 }
 
-extension OptionName {
-    func format(in path: [OptionName]) -> String {
+extension Name {
+    func format(in path: [Name]) -> String {
         if path.isEmpty {
             return "‘\(rawValue)‘"
         } else {

@@ -7,31 +7,40 @@ final class ConfigurationParserTests: XCTestCase {
             case low, medium, high
         }
 
-        @Option(documentation: "The power level used if not otherwise specified.")
+        @Option(
+            summary: "The power level used if not otherwise specified.",
+            discussion: """
+                When setting a default power level, it is crucial that you \
+                are sure that the consumption will not exceed the daily \
+                allocated allowance. Failure to keep within your usage \
+                limits will result in termination of the contract.
+
+                It's recommended that you do not change this value unless \
+                you are fully aware of the risks involved.
+                """
+        )
         var defaultPowerLevel: Power = .medium
 
-        @Option(documentation: "Array of preferred spoken languages")
+        @Option(summary: "Array of preferred spoken languages")
         var preferredLanguages: [String] = ["en", "fr", "ar"]
 
         @Option(
-            availability: .deprecated("Replaced by ‘preferredLanguages‘"),
-            documentation: Documentation(
-                hidden: true,
-                summary: "The preferred spoken language"
-            )
+            .deprecated("Replaced by ‘preferredLanguages‘"),
+            summary: "The preferred spoken language",
+            hidden: true
         )
         var preferredLanguage: String? = nil
 
         var showInternalMenu: Bool = false
 
-        @Option(documentation: "Details of the author used when creating commits")
+        @Option(summary: "Details of the author used when creating commits")
         var author: Author
 
         struct Author: ParsableConfiguration {
-            @Option(documentation: "The full name of the author")
+            @Option(summary: "The full name of the author")
             var name: String = "John Doe"
 
-            @Option(documentation: "The email address of the author")
+            @Option(summary: "The email address of the author")
             var email: String = "no-reply@example.com"
         }
     }

@@ -1,20 +1,15 @@
 import Foundation
 
-protocol OptionDefinitionProvider {
-    func optionDefinition(for name: OptionName) -> OptionDefinition
-}
-
 enum Parsed<Value> {
     case value(Value)
-    case definition((OptionName) -> OptionDefinition)
+    case definition((Name) -> OptionDefinition)
 
-    init(_ makeDefinition: @escaping (OptionName) -> OptionDefinition) {
+    init(_ makeDefinition: @escaping (Name) -> OptionDefinition) {
         self = .definition(makeDefinition)
     }
 }
 
-@propertyWrapper
-public struct Option<Wrapped> {
+@propertyWrapper public struct Option<Wrapped> {
     var _parsedOption: Parsed<Wrapped>
 
     init(_parsedOption: Parsed<Wrapped>) {
@@ -53,15 +48,17 @@ public struct Option<Wrapped> {
 public extension Option {
     init(
         wrappedValue: Wrapped,
-        availability: OptionAvailability = .available,
-        documentation: Documentation? = nil
+        _ availability: Availability = .available,
+        summary: String = "",
+        discussion: String = "",
+        hidden: Bool = false
     ) {
         self.init(_parsedOption: .init { name in
             OptionDefinition(
                 name: name,
                 content: .defaultValue(wrappedValue),
                 availability: availability,
-                documentation: documentation
+                documentation: Documentation(summary: summary, discussion: discussion, hidden: hidden)
             )
         })
     }
@@ -69,22 +66,26 @@ public extension Option {
 
 public extension Option where Wrapped: ParsableConfiguration {
     init(
-        availability: OptionAvailability = .available,
-        documentation: Documentation? = nil
+        _ availability: Availability = .available,
+        summary: String = "",
+        discussion: String = "",
+        hidden: Bool = false
     ) {
         self.init(_parsedOption: .init { name in
             OptionDefinition(
                 name: name,
                 content: .container(Wrapped.options),
                 availability: availability,
-                documentation: documentation
+                documentation: Documentation(summary: summary, discussion: discussion, hidden: hidden)
             )
         })
     }
 }
 
+// MARK: - Decoding
+
 extension Option: OptionDefinitionProvider {
-    func optionDefinition(for name: OptionName) -> OptionDefinition {
+    func optionDefinition(for name: Name) -> OptionDefinition {
         switch _parsedOption {
         case .value:
             fatalError("Trying to get option definition from a resolved property")

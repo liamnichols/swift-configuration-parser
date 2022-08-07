@@ -1,8 +1,8 @@
 import Foundation
 
 public struct OptionOverride: RawRepresentable {
-    let name: OptionName
-    let path: [OptionName]
+    let name: Name
+    let path: [Name]
     let valueString: String
 
     public init?(rawValue: String) {
@@ -23,9 +23,9 @@ public struct OptionOverride: RawRepresentable {
         // Work out the coding path for the key (if any)
         let components = keyString.components(separatedBy: ".")
         let name = components.last!
-        let path = components.dropLast().map(OptionName.init(rawValue:))
+        let path = components.dropLast().map(Name.init(rawValue:))
 
-        self.name = OptionName(rawValue: name)
+        self.name = Name(rawValue: name)
         self.path = path
         self.valueString = valueString
     }
