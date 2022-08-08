@@ -71,7 +71,7 @@ let configuration = try Configuration.parse(data)
 - Flexible overrides
 - Customizable decoding - Uses `JSONDecoder` by default but you can plug in anything
 
-For an example, see [Example](./Example/).
+For an example, see the simple [example package](./Example/) or the [usage in CreateAPI](https://github.com/CreateAPI/CreateAPI/blob/main/Sources/CreateOptions/ConfigOptions.swift).
 
 ---
 
