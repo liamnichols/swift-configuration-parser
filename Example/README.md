@@ -34,7 +34,7 @@ While the `repeatCount` was set to `10` by default, the greeting was printed `20
 Now try running the following command:
 
 ```
-$ swift run configure-me --config config.json --option repeatCount:2 --option 'style:"uppercase"'
+$ swift run configure-me --config config.json --config-option repeatCount=2 --config-option 'style="uppercase"'
 ```
 
 You'll see the following
@@ -50,7 +50,7 @@ Overrides are parsed as `key:value` where `key` is a dot notation path to a prop
 Finally, try one more option:
 
 ```
-$ swift run configure-me --config config.json --option repeatCount:2 --option 'isUppercase:true'
+$ swift run configure-me --config config.json --config-option repeatCount=2 --config-option 'isUppercase=true'
 ```
 
 You will see the following:

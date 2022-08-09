@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "swift-configuration-parser-example",
+    platforms: [
+        .macOS(.v10_15)
+    ],
     products: [
         .executable(name: "configure-me", targets: ["ConfigureMe"])
     ],

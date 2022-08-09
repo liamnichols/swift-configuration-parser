@@ -17,11 +17,11 @@ struct ConfigureMe: ParsableCommand {
     var config: String
 
     @Option(help: "Configuration overrides")
-    var option: [OptionOverride] = []
+    var configOption: [OptionOverride] = []
 
     func run() throws {
         let fileURL = URL(fileURLWithPath: config)
-        let configuration = try Configuration.parse(contentsOf: fileURL, overrides: option) { issue in
+        let configuration = try Configuration.parse(contentsOf: fileURL, overrides: configOption) { issue in
             print("NOTE:", issue.description)
         }
 
