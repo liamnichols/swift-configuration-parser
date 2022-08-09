@@ -115,10 +115,10 @@ final class ConfigurationParserTests: XCTestCase {
         """.utf8)
 
         let overrides: [OptionOverride] = [
-            #"defaultPowerLevel: 2          "#,
-            #"author.name: "Foo"            "#,
-            #"preferredLanguages: ["en"]    "#,
-            #"unknownProperty: false        "#
+            #"defaultPowerLevel=2"#,
+            #"author.name="Foo""#,
+            #"preferredLanguages=["en"]"#,
+            #"unknownProperty=false"#
         ]
 
         var recordedIssues: [Issue] = []
@@ -133,5 +133,11 @@ final class ConfigurationParserTests: XCTestCase {
         XCTAssertEqual(Set(recordedIssues.map(\.description)), [
             "Found unexpected property ‘unknownProperty‘ while decoding."
         ])
+    }
+}
+
+extension OptionOverride: ExpressibleByStringLiteral {
+    public init(stringLiteral value: StaticString) {
+        self = OptionOverride(String(describing: value))!
     }
 }

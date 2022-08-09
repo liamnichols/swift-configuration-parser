@@ -33,7 +33,7 @@ public extension ParsableConfiguration {
     /// - Parameters:
     ///   - data: The data representation of the configuration file to be decoded and read from.
     ///   - overrides: An array of individual overrides that take priority over the values defined in the configuration.
-    ///   - decoder: A type used to decode the `data` or the `valueString`'s provided in the `overrides`.
+    ///   - decoder: A type used to decode input data or overrides.
     ///   - issueHandler: A closure invoked whenever an issue is detected. By default a message will be printed to the console.
     /// - Returns: The configuration will all options successfully resolved to a value.
     static func parse<T: TopLevelDecoder>(
@@ -82,7 +82,7 @@ public extension ParsableConfiguration {
     /// - Parameters:
     ///   - data: The data representation of the configuration file to be decoded and read from.
     ///   - overrides: An array of individual overrides that take priority over the values defined in the configuration.
-    ///   - decoder: A type used to decode the `data` or the `valueString`'s provided in the `overrides`.
+    ///   - decoder: A type used to decode input data or overrides.
     ///   - issueHandler: A closure invoked whenever an issue is detected. By default a message will be printed to the console.
     /// - Returns: The configuration will all options successfully resolved to a value.
     static func parse<T: TopLevelDecoder>(
@@ -126,7 +126,7 @@ public extension ParsableConfiguration {
     ///
     /// - Parameters:
     ///   - overrides: An array of individual overrides that take priority over the values defined in the configuration.
-    ///   - decoder: A type used to decode the `data` or the `valueString`'s provided in the `overrides`.
+    ///   - decoder: A type used to decode input data or overrides.
     ///   - issueHandler: A closure invoked whenever an issue is detected. By default a message will be printed to the console.
     /// - Returns: The configuration will all options successfully resolved to a value.
     static func parse<T: TopLevelDecoder>(
@@ -145,7 +145,7 @@ public extension ParsableConfiguration {
     ///
     /// - Parameters:
     ///   - overrides: An array of individual overrides that take priority over the values defined in the configuration.
-    ///   - decoder: A type used to decode the `data` or the `valueString`'s provided in the `overrides`.
+    ///   - decoder: A type used to decode input data or overrides.
     ///   - issueHandler: A closure invoked whenever an issue is detected. By default a message will be printed to the console.
     /// - Returns: The configuration will all options successfully resolved to a value.
     static func parse(

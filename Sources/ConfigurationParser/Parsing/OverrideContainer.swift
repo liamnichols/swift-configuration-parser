@@ -10,9 +10,8 @@ struct OverrideContainer {
         guard let override = overrides.first(where: { $0.name == name && $0.path == path }) else { return nil }
 
         // Decode the value
-        let data = Data(override.valueString.utf8)
         do {
-            return try decoder.decode(type, from: data)
+            return try decoder.decode(type, from: override.value)
         } catch {
             throw DecodingError.dataCorrupted(DecodingError.Context(
                 codingPath: codingPath + [key],
